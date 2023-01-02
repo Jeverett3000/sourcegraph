@@ -22,7 +22,7 @@ import { ThemePreferenceProps } from '../../theme'
 import { eventLogger } from '../../tracking/eventLogger'
 import { HomePanels } from '../panels/HomePanels'
 
-import { QueryExamplesHomepage } from './QueryExamplesHomepage'
+import { QueryExamplesHomepage } from '@sourcegraph/search-ui/src/components/QueryExamplesHomepage'
 import { SearchPageFooter } from './SearchPageFooter'
 import { SearchPageInput } from './SearchPageInput'
 

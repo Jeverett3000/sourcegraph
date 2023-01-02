@@ -12,7 +12,7 @@ import { Button, H2, Link, Icon, Tabs, TabList, TabPanels, TabPanel, Tab } from 
 import { CloudCtaBanner } from '../../components/CloudCtaBanner'
 
 import { exampleQueryColumns } from './QueryExamplesHomepage.constants'
-import { useQueryExamples, QueryExamplesSection } from './useQueryExamples'
+import { useQueryExamples, QueryExamplesSection } from '../util/useQueryExamples'
 
 import styles from './QueryExamplesHomepage.module.scss'
 
