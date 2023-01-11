@@ -6,11 +6,14 @@ GORELEASER_CROSS_VERSION=v1.19.5
 # TTTTTTTTTT TODO(sqs): unskip ENTERPRISE=1 DEV_WEB_BUILDER=esbuild yarn run build-web
 
 #-e "GITHUB_TOKEN=$GITHUB_TOKEN" \
-#-e "DOCKER_USERNAME=$DOCKER_USERNAME" -e "DOCKER_PASSWORD=$DOCKER_PASSWORD" -e "DOCKER_REGISTRY=$DOCKER_REGISTRY" \
+  #-e "DOCKER_USERNAME=$DOCKER_USERNAME" -e "DOCKER_PASSWORD=$DOCKER_PASSWORD" -e "DOCKER_REGISTRY=$DOCKER_REGISTRY" \
+
+# TODO(sqs): must run `gcloud auth application-default login` before to get the application_default_credentials.json file in place
 
 exec docker run --rm --privileged \
        -v "$ROOTDIR":/go/src/github.com/sourcegraph/sourcegraph \
        -v /var/run/docker.sock:/var/run/docker.sock \
        -w /go/src/github.com/sourcegraph/sourcegraph \
+       -v $HOME/.config/gcloud/application_default_credentials.json:/root/.config/gcloud/application_default_credentials.json \
        goreleaser/goreleaser-cross:${GORELEASER_CROSS_VERSION} \
        --config dev/app/goreleaser.yaml --rm-dist "$@"
