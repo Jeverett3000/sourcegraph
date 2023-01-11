@@ -11,11 +11,12 @@ import { TelemetryProps } from '@sourcegraph/shared/src/telemetry/telemetryServi
 import { buildCloudTrialURL } from '@sourcegraph/shared/src/util/url'
 import { Button, H2, Link, Icon, Tabs, TabList, TabPanels, TabPanel, Tab } from '@sourcegraph/wildcard'
 
-import { CloudCtaBanner } from '../../components/CloudCtaBanner'
-import { SearchPatternType } from '../../graphql-operations'
+import { CloudCtaBanner } from '../../../web/src/components/CloudCtaBanner'
+import { SearchPatternType } from '../../../web/src/graphql-operations'
+
+import { useQueryExamples, QueryExamplesSection } from '../util/useQueryExamples'
 
 import { exampleQueryColumns } from './QueryExamplesHomepage.constants'
-import { useQueryExamples, QueryExamplesSection } from '../util/useQueryExamples'
 
 import styles from './QueryExamplesHomepage.module.scss'
 
