@@ -63,14 +63,14 @@ checksum:
 changelog:
   skip: true
 
-# TODO(sqs): consider using this?
-#
-# release:
-#   github:
-#     owner: sourcegraph
-#     name: sourcegraph
-#   draft: false
-#   prerelease: auto
+release:
+  github:
+    owner: sourcegraph
+    name: sourcegraph
+  draft: true
+  prerelease: auto
+  # TODO(sqs): un-disable
+  disable: true
 
 blobs:
   - provider: gs
