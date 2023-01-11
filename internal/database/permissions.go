@@ -28,12 +28,17 @@ var permissionInsertColumns = []*sqlf.Query{
 type PermissionStore interface {
 	basestore.ShareableStore
 
+	// Transact creates a transaction-enabled store for the permissionStore
+	Transact(context.Context) (PermissionStore, error)
+
 	// Create inserts the given permission into the database.
 	Create(ctx context.Context, opts CreatePermissionOpts) (*types.Permission, error)
 	// BulkCreate inserts multiple permissions into the database
 	BulkCreate(ctx context.Context, opts []CreatePermissionOpts) ([]*types.Permission, error)
 	// Delete deletes a permission with the provided ID
 	Delete(ctx context.Context, opts DeletePermissionOpts) error
+	// BulkDelete deletes a permission with the provided ID
+	BulkDelete(ctx context.Context, opts []DeletePermissionOpts) error
 	// GetByID returns the permission matching the given ID, or PermissionNotFoundErr if no such record exists.
 	GetByID(ctx context.Context, opts GetPermissionOpts) (*types.Permission, error)
 	// List returns all the permissions in the database.
@@ -72,12 +77,21 @@ type permissionStore struct {
 
 var _ PermissionStore = &permissionStore{}
 
+func PermissionsWith(other basestore.ShareableStore) PermissionStore {
+	return &permissionStore{Store: basestore.NewWithHandle(other.Handle())}
+}
+
 const permissionCreateQueryFmtStr = `
 INSERT INTO
 	permissions(%s)
 VALUES %S
 RETURNING %s
 `
+
+func (p *permissionStore) Transact(ctx context.Context) (PermissionStore, error) {
+	txBase, err := p.Store.Transact(ctx)
+	return &permissionStore{Store: txBase}, err
+}
 
 func (p *permissionStore) Create(ctx context.Context, opts CreatePermissionOpts) (*types.Permission, error) {
 	q := sqlf.Sprintf(
@@ -166,6 +180,39 @@ func (p *permissionStore) Delete(ctx context.Context, opts DeletePermissionOpts)
 	return nil
 }
 
+func (p *permissionStore) BulkDelete(ctx context.Context, opts []DeletePermissionOpts) error {
+	if len(opts) == 0 {
+		return errors.New("missing ids from sql query")
+	}
+
+	var ids []*sqlf.Query
+	for _, opt := range opts {
+		ids = append(ids, sqlf.Sprintf("%s", opt.ID))
+	}
+
+	q := sqlf.Sprintf(
+		permissionDeleteQueryFmtStr,
+		sqlf.Sprintf(
+			"id IN (%s)",
+			sqlf.Join(ids, ", "),
+		),
+	)
+	result, err := p.ExecResult(ctx, q)
+	if err != nil {
+		return errors.Wrap(err, "running delete query")
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return errors.Wrap(err, "checking deleted rows")
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("failed to delete permissions")
+	}
+	return nil
+}
+
 const getPermissionQueryFmtStr = `
 SELECT %s FROM permissions
 WHERE id = %s;
@@ -193,9 +240,13 @@ func (p *permissionStore) GetByID(ctx context.Context, opts GetPermissionOpts) (
 	return permission, nil
 }
 
+// The ORDER BY clause should not be changed because it ensures permissions retrieved
+// from the database are already sorted therefore making the rbac schema migration easy.
+// We compare permissions in the database to those generated from the schema and both
+// need to be sorted.
 const permissionListQueryFmtStr = `
 SELECT * FROM permissions
-ORDER BY permissions.namespace ASC
+ORDER BY permissions.namespace, permissions.action ASC
 `
 
 func (p *permissionStore) List(ctx context.Context) ([]*types.Permission, error) {
