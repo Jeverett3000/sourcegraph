@@ -49,6 +49,9 @@ builds:
   #   ldflags: *ldflags
   #   flags: *goflags
 
+universal_binaries:
+  - id: build_macos
+
 archives:
   - id: zip_archives
     builds: ['build_linux', 'build_macos']
