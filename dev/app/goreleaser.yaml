@@ -1,0 +1,85 @@
+project_name: sqlitr
+env:
+  - CGO_ENABLED=1
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: build_macos
+    env:
+      - CC=o64-clang
+      - CXX=o64-clang++
+    main: ./main.go
+    goos:
+      - darwin
+    goarch:
+      - amd64
+
+  - id: build_linux
+    env:
+    main: ./main.go
+    goos:
+      - linux
+    goarch:
+      - amd64
+    ldflags:
+      # Note the additional ldflags (-linkmode etc), and the "-tags=netgo" in
+      # flags below. This is to build a static binary.
+      - -linkmode external -extldflags -static -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser
+    flags:
+      - -tags=netgo
+      - -v
+
+  - id: build_windows
+    env:
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+    main: ./main.go
+    goos:
+      - windows
+    goarch:
+      - amd64
+
+archives:
+  - builds: ['build_macos', 'build_linux', 'build_windows']
+    format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-snapshot"
+
+changelog:
+  skip: true
+
+release:
+  github:
+    owner: sourcegraph
+    name: sourcegraph
+  draft: false
+  prerelease: auto
+
+nfpms:
+  - builds: ['build_linux']
+    formats:
+      - deb
+      - rpm
+    vendor: "sourcegraph"
+    homepage: "https://github.com/sourcegraph/sourcegraph"
+    maintainer: "dev@sourcegraph.com"
+    description: "Code intelligence and search"
+    license: "Sourcegraph Enterprise License (portions licensed under Apache 2)"
+
+brews:
+  - homepage: "https://github.com/sourcegraph/sourcegraph"
+    description: "Code intelligence and search"
+    github:
+      owner: sourcegraph
+      name: homebrew-sourcegraph
+    install: |
+      bin.install "sourcegraph"
+    test: |
+      system "#{bin}/sourcegraph --help"
+
+# TODO(sqs): add back `dockers`, `scoop`, `snapcraft` as needed

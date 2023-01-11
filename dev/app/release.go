@@ -38,7 +38,7 @@ import (
 var (
 	gcpProject     = flag.String("project", "sourcegraph-app-releases", "Google Cloud Platform project in which to create the bucket")
 	gcsBucket      = flag.String("bucket", "sourcegraph-app-releases", "Google Cloud Storage bucket where releases are uploaded")
-	releaseVersion = flag.String("release-version", "dev", "release version string") // TODO(sqs): make same as in build.sh
+	releaseVersion = flag.String("release-version", "0.0.0+dev", "release version string") // TODO(sqs): make same as in build.sh
 	skipBuild      = flag.Bool("skip-build", false, "skip building")
 )
 
