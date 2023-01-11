@@ -28,9 +28,7 @@ build() {
   [[ ${os} == windows ]] && ext=".exe"
   binary=".bin/$(basename ${pkg})-${os}-${arch}-dist${ext}"
   echo "--- go build for ${os}/${arch}"
-  (ENTERPRISE=1 \
-    DEV_WEB_BUILDER="esbuild yarn run build-web" \
-    GOOS="${os}" \
+  (GOOS="${os}" \
     GOARCH="${arch}" \
     go build -trimpath \
     -ldflags "${ldflags[*]}" \
