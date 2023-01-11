@@ -117,6 +117,7 @@ done
 
 [ ${#target_platforms[@]} -eq 0 ] && target_platforms=("${native_platform}")
 
+ENTERPRISE=1 DEV_WEB_BUILDER=esbuild yarn run build-web
 for platform in "${target_platforms[@]}"; do
   build "${platform}" &
 done
