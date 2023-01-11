@@ -197,7 +197,6 @@ require (
 	github.com/cockroachdb/apd/v2 v2.0.1 // indirect
 	github.com/dennwc/varint v1.0.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
-	github.com/fergusstrange/embedded-postgres v1.19.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
@@ -220,6 +219,7 @@ require (
 	github.com/coreos/go-iptables v0.6.0
 	github.com/crewjam/saml/samlidp v0.0.0-20221211125903-d951aa2d145a
 	github.com/dcadenas/pagerank v0.0.0-20171013173705-af922e3ceea8
+	github.com/fergusstrange/embedded-postgres v1.19.0
 	github.com/frankban/quicktest v1.14.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/go-github/v47 v47.1.0

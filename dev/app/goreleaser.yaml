@@ -1,54 +1,64 @@
-project_name: sqlitr
+project_name: sourcegraph
+
 env:
   - CGO_ENABLED=1
+
+gomod:
+  proxy: true
+
 before:
   hooks:
-    - go mod download
-builds:
-  - id: build_macos
-    env:
-      - CC=o64-clang
-      - CXX=o64-clang++
-    main: ./main.go
-    goos:
-      - darwin
-    goarch:
-      - amd64
+    ######### TODO(sqs): unskip - go mod tidy
 
+builds:
   - id: build_linux
-    env:
-    main: ./main.go
     goos:
       - linux
     goarch:
       - amd64
-    ldflags:
-      # Note the additional ldflags (-linkmode etc), and the "-tags=netgo" in
-      # flags below. This is to build a static binary.
-      - -linkmode external -extldflags -static -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser
-    flags:
-      - -tags=netgo
+    main: &gomain ./enterprise/cmd/sourcegraph
+    ldflags: &ldflags
+      - -X github.com/sourcegraph/sourcegraph/internal/version.version={{.Env.VERSION}}
+      - -X github.com/sourcegraph/sourcegraph/internal/version.timestamp={{.Timestamp}}
+      - -X github.com/sourcegraph/sourcegraph/internal/conf/deploy.forceType=single-program
+    flags: &goflags
+      - -trimpath
       - -v
 
-  - id: build_windows
-    env:
-      - CC=x86_64-w64-mingw32-gcc
-      - CXX=x86_64-w64-mingw32-g++
-    main: ./main.go
+  - id: build_macos
     goos:
-      - windows
+      - darwin
     goarch:
       - amd64
+      - arm64
+    env:
+      - CC=o64-clang
+      - CXX=o64-clang++
+    main: *gomain
+    ldflags: *ldflags
+    flags: *goflags
+
+  # TODO(sqs): Windows builds are broken due to compilation errors in: github.com/sourcegraph/mountinfo, github.com/coreos/go-iptables, github.com/sourcegraph/zoekt
+  #
+  # - id: build_windows
+  #   goos:
+  #     - windows
+  #   goarch:
+  #     - amd64
+  #   env:
+  #     - CC=x86_64-w64-mingw32-gcc
+  #     - CXX=x86_64-w64-mingw32-g++
+  #   main: *gomain
+  #   ldflags: *ldflags
+  #   flags: *goflags
 
 archives:
-  - builds: ['build_macos', 'build_linux', 'build_windows']
+  - id: zip_archives
+    builds: ['build_linux', 'build_macos']
     format: zip
 
 checksum:
   name_template: 'checksums.txt'
-
-snapshot:
-  name_template: "{{ .Tag }}-snapshot"
 
 changelog:
   skip: true
@@ -60,8 +70,19 @@ release:
   draft: false
   prerelease: auto
 
+blobs:
+  - provider: gs
+    bucket: sourcegraph-app-releases
+    folder: "{{.Version}}"
+    ids:
+      - build_linux
+      - build_macos
+      - zip_archives
+      - linux_packages
+
 nfpms:
-  - builds: ['build_linux']
+  - id: linux_packages
+    builds: ['build_linux']
     formats:
       - deb
       - rpm
@@ -74,7 +95,7 @@ nfpms:
 brews:
   - homepage: "https://github.com/sourcegraph/sourcegraph"
     description: "Code intelligence and search"
-    github:
+    tap:
       owner: sourcegraph
       name: homebrew-sourcegraph
     install: |

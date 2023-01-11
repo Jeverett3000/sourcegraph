@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 
-docker run --rm --privileged \
-       -v $(pwd):/go/src/github.com/sourcegraph/sourcegraph \
+ROOTDIR="$(realpath $(dirname "${BASH_SOURCE[0]}")/../..)"
+GORELEASER_CROSS_VERSION=v1.19.5
+
+# TTTTTTTTTT TODO(sqs): unskip ENTERPRISE=1 DEV_WEB_BUILDER=esbuild yarn run build-web
+
+exec docker run --rm --privileged \
+       -v "$ROOTDIR":/go/src/github.com/sourcegraph/sourcegraph \
        -v /var/run/docker.sock:/var/run/docker.sock \
        -e "GITHUB_TOKEN=$GITHUB_TOKEN" \
        -e "DOCKER_USERNAME=$DOCKER_USERNAME" -e "DOCKER_PASSWORD=$DOCKER_PASSWORD" -e "DOCKER_REGISTRY=$DOCKER_REGISTRY" \
-       -v "${HOME}/.snapcraft.login":/.snapcraft.login \
        -w /go/src/github.com/sourcegraph/sourcegraph \
-       neilotoole/xcgo:latest goreleaser release --rm-dist
+       -e "VERSION=${VERSION-0.0.0+dev}" \
+       goreleaser/goreleaser-cross:${GORELEASER_CROSS_VERSION} \
+       --config dev/app/goreleaser.yaml --rm-dist "$@"
