@@ -83,6 +83,7 @@ var SingleProgram = conftypes.RawUnified{
 	// TODO(sqs) TODO!(sqs) TODO(single-binary): security: make this auto-generated or something so it's not guessable
 	// Today this is not used as single-binary is not yet merged into main fully, so this is not
 	// a real security risk.
+	// HACK
 	"executors.accessToken": "asdf1234asdf1234asdf1234",
 	"codeIntelAutoIndexing.enabled": true,
 	"codeIntelAutoIndexing.allowGlobalPolicies": true,

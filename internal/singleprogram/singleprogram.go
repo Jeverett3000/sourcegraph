@@ -119,6 +119,7 @@ func Init(logger log.Logger) {
 	setDefaultEnv(logger, "NO_SITE_CONFIG_ESCAPE_HATCH", "1")
 
 	// TODO(sqs): TODO(single-binary): Executor shouldnt need a password when running in single-program.
+	// HACK
 	setDefaultEnv(logger, "EXECUTOR_FRONTEND_URL", "http://localhost:3080")
 	setDefaultEnv(logger, "EXECUTOR_FRONTEND_PASSWORD", "asdf1234asdf1234asdf1234")
 	setDefaultEnv(logger, "EXECUTOR_USE_FIRECRACKER", "false")
@@ -136,6 +137,7 @@ func Init(logger log.Logger) {
 	setDefaultEnv(logger, "CTAGS_PROCESSES", "2")
 	// Write script that invokes universal-ctags via Docker.
 	// TODO(sqs): TODO(single-binary): this assumes that the `ctags` image is already built locally.
+	// HACK
 	ctagsPath := filepath.Join(cacheDir, "universal-ctags-dev")
 	writeFile(ctagsPath, []byte(universalCtagsDevScript), 0700)
 	setDefaultEnv(logger, "CTAGS_COMMAND", ctagsPath)
