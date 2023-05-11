@@ -166,7 +166,7 @@ require (
 	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/ratelimit v0.2.0
 	go.uber.org/zap v1.24.0
-	golang.org/x/crypto v0.3.0
+	golang.org/x/crypto v0.3.1-0.20221117191849-2c476679df9a
 	golang.org/x/net v0.4.0
 	golang.org/x/oauth2 v0.2.0
 	golang.org/x/sync v0.1.0
@@ -193,7 +193,7 @@ require github.com/XSAM/otelsql v0.15.0
 
 require (
 	cloud.google.com/go/compute/metadata v0.2.1 // indirect
-	github.com/cloudflare/circl v1.3.0 // indirect
+	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/cockroachdb/apd/v2 v2.0.1 // indirect
 	github.com/dennwc/varint v1.0.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
